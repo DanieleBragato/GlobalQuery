@@ -224,7 +224,7 @@ public class QueryEditDialogController {
 					updateProgress(i, listSchemi.size());
 				}
 				if (listResults.size() > 0) {
-					if (FileExcelCreator.writeFileExcelOfResults(pathFileResults, listResults)) {
+					if (FileExcelCreator.writeFileExcelOfResults(pathFileResults, listResults, queryDB)) {
 						//System.out.println("sono dentro il metodo call del Task - estrazione Dati Terminata Correttamente");
 						estrazioneDatiTerminataCorrettamente = true;
 					} else {
@@ -242,7 +242,7 @@ public class QueryEditDialogController {
             	//System.out.println("sono dentro il metodo succeeded del Task");
                 super.succeeded();
                 updateMessage("Done!");
-                showAlert(AlertType.INFORMATION, "Information Dialog", listSchemi.size() + " schemi trattati \n" + qtaRigheEstratte + " righe estratte", "Dati salvati sul file\n" + pathFileResults, null);
+                showAlertEstrazioneOK();
                 bar.progressProperty().unbind();
                 bar.setProgress(0);
             	btnRunQuery.setDisable(false);
@@ -252,7 +252,8 @@ public class QueryEditDialogController {
         		disabledView(false);
             }
 
-            @Override protected void cancelled() {
+
+			@Override protected void cancelled() {
             	//System.out.println("sono dentro il metodo cancelled del Task");
                 super.cancelled();
                 updateMessage("Cancelled!");
@@ -261,6 +262,25 @@ public class QueryEditDialogController {
             
         };
     }
+
+    private void showAlertEstrazioneOK() {
+    	
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Information Dialog");
+		alert.setHeaderText(listSchemi.size() + " schemi trattati \n" + qtaRigheEstratte + " righe estratte");
+		alert.setContentText("Dati salvati sul file\n" + pathFileResults);
+
+		ButtonType buttonOpenFile = new ButtonType("Apri File Risultati");
+		ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+
+		alert.getButtonTypes().setAll(buttonOpenFile, buttonTypeCancel);
+
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.get() == buttonOpenFile){  
+			mainApp.openFileRisultatiWithOfficeExcel(pathFileResults);
+		} 
+		
+	}
 	
     @FXML
     private void handleStop(ActionEvent event) {
@@ -424,6 +444,11 @@ public class QueryEditDialogController {
         	query.setAutore(autoreField.getText());
         	LocalDate oggi = LocalDate.now();
         	query.setDataUltimoAggionamento(oggi);
+//            File queryFile = mainApp.getQueryFilePath();
+//            if (queryFile != null) {
+//            	mainApp.addQueryToQueryData(query);
+//                mainApp.saveQueryDataToFile(queryFile);
+//            }
             okClicked = true;
             dialogStage.close();
         }
