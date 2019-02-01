@@ -444,11 +444,6 @@ public class QueryEditDialogController {
         	query.setAutore(autoreField.getText());
         	LocalDate oggi = LocalDate.now();
         	query.setDataUltimoAggionamento(oggi);
-//            File queryFile = mainApp.getQueryFilePath();
-//            if (queryFile != null) {
-//            	mainApp.addQueryToQueryData(query);
-//                mainApp.saveQueryDataToFile(queryFile);
-//            }
             okClicked = true;
             dialogStage.close();
         }

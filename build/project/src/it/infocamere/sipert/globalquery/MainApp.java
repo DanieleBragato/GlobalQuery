@@ -2,6 +2,7 @@ package it.infocamere.sipert.globalquery;
 	
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.prefs.Preferences;
@@ -31,6 +32,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 
 public class MainApp extends Application {
@@ -43,7 +45,7 @@ public class MainApp extends Application {
      */
     private ObservableList<QueryModel> queryData = FXCollections.observableArrayList();
     
-    /**
+	/**
      *  gli schemi dei data base oracle da trattare
      */
     private List<SchemaDTO> listSchemi = new ArrayList<SchemaDTO>();
@@ -65,6 +67,8 @@ public class MainApp extends Application {
 	public void start(Stage stagePrincipale) {
 		
         this.stagePrincipale = stagePrincipale;
+        
+        this.stagePrincipale.initStyle(StageStyle.UNDECORATED);
         this.stagePrincipale.setTitle("Global Query");
         
         // Set the application icon.
@@ -244,6 +248,10 @@ public class MainApp extends Application {
             // Crea lo Stage di dialogo
             Stage dialogStage = new Stage();
             
+            dialogStage.initStyle(StageStyle.UNDECORATED);
+            
+            //.setValue(Boolean.FALSE);
+            
             dialogStage.getIcons().add(new Image("file:resources/images/globalquery_32.png"));
             
             dialogStage.setTitle("Edit Query");
@@ -359,6 +367,18 @@ public class MainApp extends Application {
     public ObservableList<QueryModel> getQueryData() {
         return queryData;
     }
+    
+    public void setQueryData(ObservableList<QueryModel> queryData) {
+		this.queryData = queryData;
+	}
+    
+    public boolean addQueryToQueryData (QueryModel query) {
+    	if (query != null) {
+    		this.queryData.add(query);
+    		return true;
+    	}
+    	return false;
+    }
 	
     /**
      * Ritorna lo stage principale
@@ -378,5 +398,15 @@ public class MainApp extends Application {
 
 	public void setPathResultsFile(String pathResultsFile) {
 		this.pathResultsFile = pathResultsFile;
+	}
+	
+	public void openFileRisultatiWithOfficeExcel(String pathFile) {
+		File excelFile = new File(pathFile);
+		try {
+			getHostServices().showDocument(excelFile.toURI().toURL().toExternalForm());
+		} catch (MalformedURLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 }

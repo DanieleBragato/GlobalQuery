@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import it.infocamere.sipert.globalquery.db.QueryDB;
 import it.infocamere.sipert.globalquery.db.dto.GenericResultsDTO;
 import jxl.Workbook;
 import jxl.write.Label;
@@ -21,14 +22,19 @@ import jxl.write.biff.RowsExceededException;
 
 public class FileExcelCreator {
 
-	public static boolean writeFileExcelOfResults(String fileName, List<GenericResultsDTO> results) {
+	public static boolean writeFileExcelOfResults(String fileName, List<GenericResultsDTO> results, QueryDB queryDB) {
 		
         WritableWorkbook wbook = null;
         
         try {
 
             wbook = Workbook.createWorkbook(new File(fileName));
-            WritableSheet excelSheet = wbook.createSheet("Sheet 1", 0);
+            WritableSheet excelSheetDatiEstratti = wbook.createSheet("Dati Estratti", 0);
+            
+            WritableSheet excelSheetQuery = wbook.createSheet("Query", 1);
+            Label labelQuery = new Label(Constants.COLONNA_ZERO, Constants.RIGA_ZERO, queryDB.getQuery());
+            excelSheetQuery.addCell(labelQuery);
+            
 
             int iRiga = 0;	
             for (GenericResultsDTO resultsDTO : results) {
@@ -43,11 +49,11 @@ public class FileExcelCreator {
             		if (iRiga == 0) {
         				//  inserimento del nome della prima colonna (Schema)    
             			Label label = new Label(Constants.COLONNA_ZERO, Constants.RIGA_ZERO, Constants.SCHEMA);
-            			excelSheet.addCell(label);
-            			addCellValue(excelSheet, Constants.COLONNA_ZERO, Constants.RIGA_ZERO + 1, resultsDTO.getSchema());
+            			excelSheetDatiEstratti.addCell(label);
+            			addCellValue(excelSheetDatiEstratti, Constants.COLONNA_ZERO, Constants.RIGA_ZERO + 1, resultsDTO.getSchema());
             		} else {
         				//  inserimento del valore della colonna (Schema)
-            			addCellValue(excelSheet, Constants.COLONNA_ZERO, iRiga, resultsDTO.getSchema());
+            			addCellValue(excelSheetDatiEstratti, Constants.COLONNA_ZERO, iRiga, resultsDTO.getSchema());
             		}
         			int iColonna = 1;
             		while(it.hasNext()){
@@ -59,14 +65,14 @@ public class FileExcelCreator {
             				//  inserimento dei nomi delle colonne
             				if (me.getKey() instanceof String) {
             		            Label label = new Label(iColonna, iRiga, (String) me.getKey());
-            		            excelSheet.addCell(label);
-            		            addCellValue(excelSheet, iColonna, iRiga + 1, me.getValue());
+            		            excelSheetDatiEstratti.addCell(label);
+            		            addCellValue(excelSheetDatiEstratti, iColonna, iRiga + 1, me.getValue());
             				} else {
             					// TODO  gestire l'eventuale assenza del tipo nome colonna diverso da String 
             				}
             			} else {
             				//  inserimento dei valori delle colonne
-            				addCellValue(excelSheet, iColonna, iRiga, me.getValue());
+            				addCellValue(excelSheetDatiEstratti, iColonna, iRiga, me.getValue());
             			}
             			iColonna++;
             		}

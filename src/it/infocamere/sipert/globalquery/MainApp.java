@@ -32,6 +32,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 
 public class MainApp extends Application {
@@ -66,6 +67,8 @@ public class MainApp extends Application {
 	public void start(Stage stagePrincipale) {
 		
         this.stagePrincipale = stagePrincipale;
+        
+        this.stagePrincipale.initStyle(StageStyle.UNDECORATED);
         this.stagePrincipale.setTitle("Global Query");
         
         // Set the application icon.
@@ -244,6 +247,10 @@ public class MainApp extends Application {
 
             // Crea lo Stage di dialogo
             Stage dialogStage = new Stage();
+            
+            dialogStage.initStyle(StageStyle.UNDECORATED);
+            
+            //.setValue(Boolean.FALSE);
             
             dialogStage.getIcons().add(new Image("file:resources/images/globalquery_32.png"));
             
