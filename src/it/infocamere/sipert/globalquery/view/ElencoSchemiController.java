@@ -7,6 +7,8 @@ package it.infocamere.sipert.globalquery.view;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import it.infocamere.sipert.globalquery.MainApp;
+import it.infocamere.sipert.globalquery.model.Model;
 import it.infocamere.sipert.globalquery.model.Schema;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -16,6 +18,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 public class ElencoSchemiController {
 
@@ -39,13 +42,32 @@ public class ElencoSchemiController {
     
 	private ObservableList<Schema> masterData = FXCollections.observableArrayList();
 
+	private Model model ;
+	private Stage dialogStage;
+    private MainApp mainApp;
+	
+    public void setMainApp(MainApp mainApp) {
+        this.mainApp = mainApp;
+    }
+    
+    public void setDialogStage(Stage dialogStage) {
+        this.dialogStage = dialogStage;
+    }
+
 	/**
 	 *  
 	 */
 	public ElencoSchemiController() {
+		
 		masterData.add(new Schema("XYZFC4", "Camera di commercio di Milano"));
 		masterData.add(new Schema("W3S7B1", "Camera di commercio di Torino"));
 		masterData.add(new Schema("TR4DSW", "Camera di commercio di Firenze"));
+		
+		masterData.add(new Schema("dasdasXYZFC4", "Camera di commercio di Roma"));
+		masterData.add(new Schema("W3S7Bfsdf1", "Camera di commercio di Padova"));
+		masterData.add(new Schema("TR4DScdW", "Camera di commercio di Modena"));
+		
+		masterData.add(new Schema("XYZfsdfsdfFC4", "Camera di commercio di Bologna"));
 
 	}
 	
@@ -89,4 +111,9 @@ public class ElencoSchemiController {
 		schemiTable.setItems(sortedData);
 
     }
+    
+	public void setModel(Model model) {
+		this.model = model;
+	}
+	    
 }

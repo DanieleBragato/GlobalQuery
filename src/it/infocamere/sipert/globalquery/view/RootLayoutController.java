@@ -149,6 +149,11 @@ public class RootLayoutController {
         }
     }
     
+    @FXML
+    private void handleSchemiProd() {
+        mainApp.showListSchemiDialog(true);;	
+    }
+    
     /**
      * apre il dialogo dell'about
      */
