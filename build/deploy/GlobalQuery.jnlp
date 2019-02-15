@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="GlobalQuery.jar" size="42347" download="eager" />
+    <jar href="GlobalQuery.jar" size="47156" download="eager" />
     <jar href="libs\gradle-wrapper.jar" size="54212" download="eager" />
     <jar href="libs\jxl.jar" size="725735" download="eager" />
     <jar href="libs\ojdbc7.jar" size="3698857" download="eager" />

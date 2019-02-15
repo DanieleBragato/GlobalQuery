@@ -17,6 +17,8 @@ import it.infocamere.sipert.globalquery.exception.ErroreFileSchemiNonTrovato;
 import it.infocamere.sipert.globalquery.model.Model;
 import it.infocamere.sipert.globalquery.model.QueryListWrapper;
 import it.infocamere.sipert.globalquery.model.QueryModel;
+import it.infocamere.sipert.globalquery.util.Constants;
+import it.infocamere.sipert.globalquery.view.ElencoSchemiController;
 import it.infocamere.sipert.globalquery.view.QueryEditDialogController;
 import it.infocamere.sipert.globalquery.view.QueryOverviewController;
 import it.infocamere.sipert.globalquery.view.RootLayoutController;
@@ -278,6 +280,56 @@ public class MainApp extends Application {
         } catch (IOException e) {
             e.printStackTrace();
             return false;
+        }
+    }
+    
+	/**
+     * Apre un dialog di esposizione della lista degli schemi oracle.
+     * 
+     * @param produzione
+     *
+     */
+    public void showListSchemiDialog(boolean produzione) {
+        try {
+            // carico dell' fxml file e creazione del nuovo stage per il popup dialog.
+        	
+            FXMLLoader loader = new FXMLLoader();
+            loader.setLocation(MainApp.class.getResource("view/ElencoSchemi.fxml"));
+            AnchorPane page = (AnchorPane) loader.load();
+
+            // Crea lo Stage di dialogo
+            Stage dialogStage = new Stage();
+            
+            dialogStage.initStyle(StageStyle.UNDECORATED);
+            
+            //.setValue(Boolean.FALSE);
+            
+            dialogStage.getIcons().add(new Image("file:resources/images/globalquery_32.png"));
+            String tipoAmbiente = Constants.SVILUPPO;
+            if (produzione) tipoAmbiente = Constants.PRODUZIONE;
+            dialogStage.setTitle("Elenco Schemi - ambiente di " + tipoAmbiente );
+            dialogStage.initModality(Modality.WINDOW_MODAL);
+            dialogStage.initOwner(stagePrincipale);
+            Scene scene = new Scene(page);
+            dialogStage.setScene(scene);
+
+            // Imposta la query nel controller
+            ElencoSchemiController controller = loader.getController();
+            controller.setMainApp(this);
+            controller.setDialogStage(dialogStage);
+            
+			// set the model
+			Model model = new Model() ;
+			controller.setModel(model);
+
+            // Show the dialog and wait until the user closes it
+            dialogStage.showAndWait();
+
+            //return controller.isOkClicked();
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            //return false;
         }
     }
     

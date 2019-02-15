@@ -46,6 +46,8 @@ public class QueryEditDialogController {
     @FXML
     private Label labelFileRisultati;
     @FXML
+    private Label labelInfoEsecuzione;
+    @FXML
     private Button btnRunQuery;
     @FXML
     private Button bntOkSalva;
@@ -155,13 +157,17 @@ public class QueryEditDialogController {
         bntStop.setDisable(false);
  
         copyWorker = createWorker(queryDB);
+        
+        labelInfoEsecuzione.textProperty().unbind();
+        labelInfoEsecuzione.textProperty().bind(copyWorker.messageProperty());
 
         bar.progressProperty().unbind();
         bar.progressProperty().bind(copyWorker.progressProperty());
        
         copyWorker.messageProperty().addListener(new ChangeListener<String>() {
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                //System.out.println("newValue " + newValue);
+                System.out.println("newValue " + newValue);
+//                labelInfoEsecuzione.setText("Schema nr. " + (i+1) + " " + listSchemi.get(i).getSchemaUserName() + " - qta righe = " + risultatiDTO.getListLinkedHashMap().size());
             }
         });
 
@@ -178,6 +184,8 @@ public class QueryEditDialogController {
             	//System.out.println("eccezione " + exception.getStackTrace());
                 copyWorker.cancel(true);
                 bar.progressProperty().unbind();
+                labelInfoEsecuzione.textProperty().unbind();
+                labelInfoEsecuzione.setText("Elaborazione fallita!");
                 bar.setProgress(0);
             	btnRunQuery.setDisable(false);
                 bntStop.setDisable(true);
@@ -219,6 +227,9 @@ public class QueryEditDialogController {
 					} 
 					risultatiDTO = model.runQuery (listSchemi.get(i), queryDB); 
 					//System.out.println("Schema nr. " + (i+1) + " " + listSchemi.get(i).getSchemaUserName() + " - qta righe = " + risultatiDTO.getListLinkedHashMap().size());
+					
+					updateMessage("Schema nr. " + (i+1) + " di " + listSchemi.size() + " - " + listSchemi.get(i).getSchemaUserName() + " - qta righe estratte = " + risultatiDTO.getListLinkedHashMap().size());
+					
 					qtaRigheEstratte = qtaRigheEstratte + risultatiDTO.getListLinkedHashMap().size();
 					listResults.add(risultatiDTO);
 					updateProgress(i, listSchemi.size());
@@ -239,11 +250,13 @@ public class QueryEditDialogController {
             }
             
             @Override protected void succeeded() {
-            	//System.out.println("sono dentro il metodo succeeded del Task");
+            	System.out.println("sono dentro il metodo succeeded del Task");
                 super.succeeded();
                 updateMessage("Done!");
                 showAlertEstrazioneOK();
                 bar.progressProperty().unbind();
+                labelInfoEsecuzione.textProperty().unbind();
+                labelInfoEsecuzione.setText("Elaborazione terminata correttamente");
                 bar.setProgress(0);
             	btnRunQuery.setDisable(false);
                 bntStop.setDisable(true);
