@@ -80,27 +80,6 @@ public class MainApp extends Application {
 
         showQueryOverview();
 		
-//		try {
-//			
-//			//BorderPane root = (BorderPane)FXMLLoader.load(getClass().getResource("MainPage.fxml"));
-//			
-//			FXMLLoader loader = new FXMLLoader(getClass().getResource("MainPage.fxml"));
-//			BorderPane root = (BorderPane) loader.load();
-//			MainPageController controller = loader.getController();
-//
-//			// set the model
-//			Model model = new Model() ;
-//			controller.setModel(model);
-//			
-//			// ********************
-//			
-//			Scene scene = new Scene(root);
-//			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-//			primaryStage.setScene(scene);
-//			primaryStage.show();
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//		}
 	}
 	
 	public void initRootLayout() {
@@ -130,7 +109,7 @@ public class MainApp extends Application {
 		if (file != null) {
 			loadQueryDataFromFile(file);
 		}
-		// tentativo di caricamento dell'ultimo file degli schemi dei data base oracle aperto 
+		// tentativo di caricamento dell'ultimo file aperto degli schemi dei data base oracle  
 		File fileSchemiDB = getSchemiFilePath();
 		if (fileSchemiDB != null) {
 			loadSchemiDataBaseFromFile(fileSchemiDB);
@@ -400,7 +379,7 @@ public class MainApp extends Application {
             loader.setLocation(MainApp.class.getResource("view/QueryOverview.fxml"));
             AnchorPane queryOverview = (AnchorPane) loader.load();
 
-            // Set person overview into the center of root layout.
+            // Set query overview into the center of root layout.
             rootLayout.setCenter(queryOverview);
 
             // Give the controller access to the main app.

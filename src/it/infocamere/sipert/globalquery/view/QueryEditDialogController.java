@@ -167,7 +167,6 @@ public class QueryEditDialogController {
         copyWorker.messageProperty().addListener(new ChangeListener<String>() {
             public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
                 System.out.println("newValue " + newValue);
-//                labelInfoEsecuzione.setText("Schema nr. " + (i+1) + " " + listSchemi.get(i).getSchemaUserName() + " - qta righe = " + risultatiDTO.getListLinkedHashMap().size());
             }
         });
 
