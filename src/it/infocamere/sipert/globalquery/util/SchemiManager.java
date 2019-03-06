@@ -4,7 +4,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
+
+import org.apache.log4j.Logger;
 
 import it.infocamere.sipert.globalquery.db.dto.SchemaDTO;
 import it.infocamere.sipert.globalquery.exception.ErroreColonneFileXlsSchemiKo;
@@ -19,9 +20,11 @@ public class SchemiManager {
 	
 	private boolean colonneFileXlsSchemiOk = false;
 	
-	private static final Logger LOGGER = Logger.getLogger(SchemiManager.class.getName());
+	private static Logger LOGGER = Logger.getLogger(SchemiManager.class.getName());
 
 	public List<SchemaDTO> getListSchemi(File fileSchemiXLS) throws ErroreFileSchemiNonTrovato, ErroreColonneFileXlsSchemiKo {
+		
+		LOGGER.debug("getListSchemi");
 		
 		List<SchemaDTO> schemi  = new ArrayList<>() ;
 		
@@ -97,6 +100,8 @@ public class SchemiManager {
 	}
 
 	private boolean checkTestataColonne(Cell[] row) {
+		
+		LOGGER.debug("checkTestataColonne");
 
 		int qtaOK = 0;
 

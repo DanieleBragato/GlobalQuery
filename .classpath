@@ -6,5 +6,6 @@
 	<classpathentry kind="lib" path="lib/ojdbc7.jar"/>
 	<classpathentry kind="lib" path="D:/DANIELE/TEMP/APACHE/POI/poi-4.0.1/gradle/wrapper/gradle-wrapper.jar"/>
 	<classpathentry kind="lib" path="lib/jxl.jar"/>
+	<classpathentry kind="lib" path="lib/apache-logging-log4j.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

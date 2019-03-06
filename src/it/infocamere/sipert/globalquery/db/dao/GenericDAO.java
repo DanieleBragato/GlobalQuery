@@ -36,6 +36,7 @@ public class GenericDAO {
 	public GenericResultsDTO executeQuery(SchemaDTO schemDTO, QueryDB queryDB) {
 		
 		GenericResultsDTO results = new GenericResultsDTO();
+		
 		results.setSchema(schemDTO.getSchemaUserName());
 		
 		SchemaDTO schemaDB = schemDTO;

@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
+
 import it.infocamere.sipert.globalquery.db.QueryDB;
 import it.infocamere.sipert.globalquery.db.dto.GenericResultsDTO;
 import jxl.Workbook;
@@ -22,7 +24,11 @@ import jxl.write.biff.RowsExceededException;
 
 public class FileExcelCreator {
 
+	private static Logger LOGGER = Logger.getLogger(FileExcelCreator.class.getName());
+	
 	public static boolean writeFileExcelOfResults(String fileName, List<GenericResultsDTO> results, QueryDB queryDB) {
+		
+		LOGGER.debug("writeFileExcelOfResults");
 		
         WritableWorkbook wbook = null;
         
@@ -128,9 +134,11 @@ public class FileExcelCreator {
 				excelSheet.addCell(number);
 			}
 		} catch (RowsExceededException e) {
+			LOGGER.debug("addCellValue RowsExceededException");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (WriteException e) {
+			LOGGER.debug("addCellValue WriteException");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
