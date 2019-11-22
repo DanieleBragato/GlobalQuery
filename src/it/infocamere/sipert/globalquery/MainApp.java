@@ -42,6 +42,8 @@ public class MainApp extends Application {
     private Stage stagePrincipale;
     private BorderPane rootLayout;
     
+    private String currentSchemiOracleFileName = null;
+    
     /**
      * i dati nel formato di observable list di queries.
      */
@@ -136,6 +138,7 @@ public class MainApp extends Application {
 		Preferences prefs = Preferences.userNodeForPackage(MainApp.class);
 		String filePathSchemiDB = prefs.get("filePathSchemiDB", null);
 		if (filePathSchemiDB != null) {
+			setCurrentSchemiOracleFileName(filePathSchemiDB);
 			return new File(filePathSchemiDB);
 		} else {
 			return null;
@@ -288,6 +291,7 @@ public class MainApp extends Application {
             if (produzione) tipoAmbiente = Constants.PRODUZIONE;
             dialogStage.setTitle("Elenco Schemi - ambiente di " + tipoAmbiente );
             dialogStage.initModality(Modality.WINDOW_MODAL);
+            
             dialogStage.initOwner(stagePrincipale);
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
@@ -300,6 +304,7 @@ public class MainApp extends Application {
 			// set the model
 			Model model = new Model() ;
 			controller.setModel(model);
+			
 
             // Show the dialog and wait until the user closes it
             dialogStage.showAndWait();
@@ -411,7 +416,15 @@ public class MainApp extends Application {
     	return false;
     }
 	
-    /**
+    public String getCurrentSchemiOracleFileName() {
+		return currentSchemiOracleFileName;
+	}
+
+	public void setCurrentSchemiOracleFileName(String currentSchemiOracleFileName) {
+		this.currentSchemiOracleFileName = currentSchemiOracleFileName;
+	}
+
+	/**
      * Ritorna lo stage principale
      * @return
      */
@@ -431,7 +444,7 @@ public class MainApp extends Application {
 		this.pathResultsFile = pathResultsFile;
 	}
 	
-	public void openFileRisultatiWithOfficeExcel(String pathFile) {
+	public void openFileWithOfficeExcel(String pathFile) {
 		File excelFile = new File(pathFile);
 		try {
 			getHostServices().showDocument(excelFile.toURI().toURL().toExternalForm());

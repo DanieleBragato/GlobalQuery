@@ -117,8 +117,37 @@ public class RootLayoutController {
 
         if (file != null) {
         	mainApp.loadSchemiDataBaseFromFile(file);
+        	mainApp.setCurrentSchemiOracleFileName(file.getAbsolutePath());
         }
     }
+    
+    /**
+     * Apre un FileChooser per permettere all'utente la scelta del corrente file degli schemi dei data base oracle
+     */
+    @FXML
+    private void handleSeeCurrentSchemi() {
+    	
+		if (mainApp.getCurrentSchemiOracleFileName() != null && mainApp.getCurrentSchemiOracleFileName() != ""
+				&& mainApp.getCurrentSchemiOracleFileName().length() > 0) {
+			
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setTitle("Information");
+			alert.setHeaderText("File Corrente Schemi Oracle");
+			alert.setContentText("File Corrente degli Schemi Oracle\n" + mainApp.getCurrentSchemiOracleFileName());
+
+			ButtonType buttonOpenFile = new ButtonType("Apri File Corrente Schemi Oracle");
+			ButtonType buttonTypeCancel = new ButtonType("Cancel", ButtonData.CANCEL_CLOSE);
+
+			alert.getButtonTypes().setAll(buttonOpenFile, buttonTypeCancel);
+
+			Optional<ButtonType> result = alert.showAndWait();
+			if (result.get() == buttonOpenFile){  
+				mainApp.openFileWithOfficeExcel(mainApp.getCurrentSchemiOracleFileName());
+			} 
+			
+    	}
+    	
+    }    
     
     @FXML
     private void handlePathFileForSaveResultsFile() {

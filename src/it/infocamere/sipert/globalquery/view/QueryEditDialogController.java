@@ -289,7 +289,7 @@ public class QueryEditDialogController {
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == buttonOpenFile){  
-			mainApp.openFileRisultatiWithOfficeExcel(pathFileResults);
+			mainApp.openFileWithOfficeExcel(pathFileResults);
 		} 
 		
 	}

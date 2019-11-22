@@ -22,7 +22,8 @@
                      </accelerator>
                   </MenuItem>
                   <MenuItem mnemonicParsing="false" onAction="#handleSaveAs" text="Save Query As..." />
-                  <MenuItem mnemonicParsing="false" onAction="#handleOpenSchemi" text="Open Schemi Data Base">
+                  <MenuItem mnemonicParsing="false" onAction="#handleSeeCurrentSchemi" text="Current File Schemi Data Base" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleOpenSchemi" text="New File Schemi Data Base">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="B" control="DOWN" meta="UP" shift="UP" shortcut="UP" />
                      </accelerator>
@@ -35,7 +36,7 @@
                   <MenuItem mnemonicParsing="false" onAction="#handleExit" text="Exit" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Schemi Oracle">
+          <Menu mnemonicParsing="false" text="Schemi Oracle" visible="false">
             <items>
               <MenuItem mnemonicParsing="false" onAction="#handleSchemiProd" text="Produzione" />
             </items>
