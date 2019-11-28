@@ -12,6 +12,7 @@ import it.infocamere.sipert.globalquery.db.dto.GenericResultsDTO;
 import it.infocamere.sipert.globalquery.db.dto.SchemaDTO;
 import it.infocamere.sipert.globalquery.model.Model;
 import it.infocamere.sipert.globalquery.model.QueryModel;
+import it.infocamere.sipert.globalquery.util.Constants;
 import it.infocamere.sipert.globalquery.util.FileExcelCreator;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -468,6 +469,15 @@ public class QueryEditDialogController {
         
         if (queryArea.getText() == null || queryArea.getText().length() == 0) {
             errorMessage += "query non valorizzata!\n"; 
+        } else {
+        	String presenceOfUpdateWordsString = presenceOfUpdateWords(queryArea.getText().toUpperCase());
+        	if (presenceOfUpdateWordsString != null && presenceOfUpdateWordsString.length() > 0) {
+        		errorMessage += "SQL NON VALIDO: impostare solo istruzioni di lettura dati.\n";
+        		errorMessage += "Togliere le istruzioni di " + presenceOfUpdateWordsString + "\n";
+        	}
+        	if (!queryArea.getText().toUpperCase().contains(Constants.SELECT)) {
+        		errorMessage += "SQL NON VALIDO: istruzioni di SELECT assenti\n";
+        	}
         }
 
 		if (errorMessage.length() == 0) {
@@ -476,6 +486,21 @@ public class QueryEditDialogController {
 			showAlert(AlertType.ERROR, "campi non validi", "Per cortesia, correggi i campi non validi", errorMessage, dialogStage);
 			return false;
 		}
+    }
+    
+    private String presenceOfUpdateWords(String sqlText) {
+        String updateWords = "";
+		if (sqlText.contains(Constants.UPDATE)) updateWords = updateWords.concat(Constants.UPDATE + " ");
+		if (sqlText.contains(Constants.DELETE)) updateWords = updateWords.concat(Constants.DELETE + " ");
+		if (sqlText.contains(Constants.INSERT)) updateWords = updateWords.concat(Constants.INSERT + " ");
+		if ( sqlText.contains(Constants.CREATE)) updateWords = updateWords.concat(Constants.CREATE + " ");
+		if ( sqlText.contains(Constants.DROP)) updateWords = updateWords.concat(Constants.DROP + " ");
+		if (sqlText.contains(Constants.ALTER)) updateWords = updateWords.concat(Constants.ALTER + " ");
+		if (sqlText.contains(Constants.GRANT)) updateWords = updateWords.concat(Constants.GRANT + " ");
+		if (sqlText.contains(Constants.MODIFY)) updateWords = updateWords.concat(Constants.MODIFY + " ");
+		if (sqlText.contains(Constants.RENAME)) updateWords = updateWords.concat(Constants.RENAME + " ");
+		if (sqlText.contains(Constants.REVOKE)) updateWords = updateWords.concat(Constants.REVOKE + " ");
+		return updateWords;
     }
     
     private boolean isInputValid() {
