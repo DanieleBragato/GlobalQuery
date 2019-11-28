@@ -500,6 +500,10 @@ public class QueryEditDialogController {
 		if (sqlText.contains(Constants.MODIFY)) updateWords = updateWords.concat(Constants.MODIFY + " ");
 		if (sqlText.contains(Constants.RENAME)) updateWords = updateWords.concat(Constants.RENAME + " ");
 		if (sqlText.contains(Constants.REVOKE)) updateWords = updateWords.concat(Constants.REVOKE + " ");
+		if (sqlText.contains(Constants.ADD)) updateWords = updateWords.concat(Constants.ADD + " ");
+		if (sqlText.contains(Constants.CONNECT)) updateWords = updateWords.concat(Constants.CONNECT + " ");
+		if (sqlText.contains(Constants.LOCK)) updateWords = updateWords.concat(Constants.LOCK + " ");
+
 		return updateWords;
     }
     

@@ -32,7 +32,9 @@ public class Constants {
 	public static final String MODIFY = "MODIFY";
 	public static final String RENAME = "RENAME";
 	public static final String REVOKE = "REVOKE";
-	
+	public static final String ADD = "ADD";
+	public static final String CONNECT = "CONNECT";
+	public static final String LOCK = "LOCK";
 	
 	public static final String SCHEMA = "Schema";
 	public static final int COLONNA_ZERO = 0;
