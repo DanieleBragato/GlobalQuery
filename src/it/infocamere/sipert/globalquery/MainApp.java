@@ -55,6 +55,8 @@ public class MainApp extends Application {
     private List<SchemaDTO> listSchemi = new ArrayList<SchemaDTO>();
     
     private String pathResultsFile = "";
+    
+    private String versione = " 1.2";
 
 	public List<SchemaDTO> getListSchemi() {
 		return listSchemi;
@@ -72,8 +74,16 @@ public class MainApp extends Application {
 		
         this.stagePrincipale = stagePrincipale;
         
-        this.stagePrincipale.initStyle(StageStyle.UNDECORATED);
-        this.stagePrincipale.setTitle("Global Query");
+        this.stagePrincipale.setOnCloseRequest(evt -> {
+            // prevent window from closing
+            evt.consume();
+
+            // execute own shutdown procedure
+            shutdown(this.stagePrincipale);
+        });
+        
+        //this.stagePrincipale.initStyle(StageStyle.UNDECORATED);
+        this.stagePrincipale.setTitle("Global Query" + versione);
         
         // Set the application icon.
         this.stagePrincipale.getIcons().add(new Image("file:resources/images/globalquery_32.png"));
@@ -83,6 +93,16 @@ public class MainApp extends Application {
         showQueryOverview();
 		
 	}
+	
+	private void shutdown(Stage mainWindow) {
+
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle("Usa l'opzione Exit");
+		alert.setHeaderText("Per cortesia usa l'opzione Exit");
+		alert.setContentText("Per cortesia usa l'opzione Exit all'interno del menù File");
+		alert.initOwner(mainWindow);
+		alert.showAndWait();
+	}	
 	
 	public void initRootLayout() {
 
@@ -114,7 +134,8 @@ public class MainApp extends Application {
 		// tentativo di caricamento dell'ultimo file aperto degli schemi dei data base oracle  
 		File fileSchemiDB = getSchemiFilePath();
 		if (fileSchemiDB != null) {
-			loadSchemiDataBaseFromFile(fileSchemiDB);
+			boolean reload = false;
+			loadSchemiDataBaseFromFile(fileSchemiDB, reload);
 		}
 		// tentativo di ricerca dell'ultimo file aperto dei risultati 
 		File filePathRisultati = getFilePathRisultati();
@@ -185,12 +206,12 @@ public class MainApp extends Application {
         }
     }
     
-	public void loadSchemiDataBaseFromFile(File fileSchemiXLS) {
+	public void loadSchemiDataBaseFromFile(File fileSchemiXLS, boolean reload) {
 
 		Model model = new Model();
 
 		try {
-			listSchemi = model.getSchemi(fileSchemiXLS);
+			listSchemi = model.getSchemi(fileSchemiXLS, reload);
 			setSchemiDataBaseFilePath(fileSchemiXLS);
 
 		} catch (ErroreFileSchemiNonTrovato e) {
@@ -323,12 +344,12 @@ public class MainApp extends Application {
             prefs.put("filePath", file.getPath());
 
             // modifica del titolo dell'app
-            stagePrincipale.setTitle("Global Query - " + file.getName());
+            // stagePrincipale.setTitle("Global Query - " + file.getName());
         } else {
             prefs.remove("filePath");
 
             // modifica del titolo dell'app
-        	stagePrincipale.setTitle("Global Query");
+        	// stagePrincipale.setTitle("Global Query");
         }
     }
     
@@ -434,6 +455,14 @@ public class MainApp extends Application {
 	
 	public static void main(String[] args) {
 		launch(args);
+	}
+	
+	public String getVersione() {
+		return versione;
+	}
+
+	public void setVersione(String versione) {
+		this.versione = versione;
 	}
 
 	public String getPathResultsFile() {

@@ -330,7 +330,7 @@ public class QueryEditDialogController {
 	        pathFileResults = fileResults.getAbsolutePath();
 	        labelFileRisultati.setText(pathFileResults);
 		} else {
-			showAlert(AlertType.ERROR, "Global Query", "Errore - nome file non corretto",
+			showAlert(AlertType.ERROR, "Global Query" + mainApp.getVersione(), "Errore - nome file non corretto",
 					"Prima di procedere con l'esecuzione delle query è necessario indicare il file di destinazione dei risultati estratti ",
 					null);
 		}
@@ -417,10 +417,10 @@ public class QueryEditDialogController {
         if (fileResults != null) {
         	mainApp.setFilePathRisultati(fileResults);
         	mainApp.setPathResultsFile(fileResults.getAbsolutePath());
-        	showAlert(AlertType.WARNING, "Global Query", "Attenzione", "l'esecuzione delle query determina la sovrascrittura del file \" + fileResults.getAbsolutePath() + \"\\nnel quale vengono salvati i dati estratti", null);
+        	showAlert(AlertType.WARNING, "Global Query" + mainApp.getVersione(), "Attenzione", "l'esecuzione delle query determina la sovrascrittura del file \" + fileResults.getAbsolutePath() + \"\\nnel quale vengono salvati i dati estratti", null);
         	return true;
         } else {
-        	showAlert(AlertType.ERROR, "Global Query", "Errore - nome file non corretto", "Prima di procedere con l'esecuzione delle query è necessario indicare il file di destinazione dei risultati estratti ", null);
+        	showAlert(AlertType.ERROR, "Global Query" + mainApp.getVersione(), "Errore - nome file non corretto", "Prima di procedere con l'esecuzione delle query è necessario indicare il file di destinazione dei risultati estratti ", null);
         	return false;
         }
     }
@@ -438,7 +438,8 @@ public class QueryEditDialogController {
 
         if (fileSchemi != null) {
         	mainApp.setSchemiDataBaseFilePath(fileSchemi);
-        	mainApp.loadSchemiDataBaseFromFile(fileSchemi);
+        	boolean reload = false;
+        	mainApp.loadSchemiDataBaseFromFile(fileSchemi, reload);
         	return true;
         } else {
         	return false;

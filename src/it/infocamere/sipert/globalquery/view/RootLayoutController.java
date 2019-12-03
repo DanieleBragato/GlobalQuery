@@ -116,7 +116,8 @@ public class RootLayoutController {
         File file = fileChooser.showOpenDialog(mainApp.getStagePrincipale());
 
         if (file != null) {
-        	mainApp.loadSchemiDataBaseFromFile(file);
+        	boolean reload = false;
+        	mainApp.loadSchemiDataBaseFromFile(file, reload);
         	mainApp.setCurrentSchemiOracleFileName(file.getAbsolutePath());
         }
     }
@@ -150,6 +151,25 @@ public class RootLayoutController {
     }    
     
     @FXML
+    private void handleReloadCurrentSchemi() {
+    	
+		if (mainApp.getCurrentSchemiOracleFileName() != null && mainApp.getCurrentSchemiOracleFileName() != ""
+				&& mainApp.getCurrentSchemiOracleFileName().length() > 0) {
+			boolean reload = true;
+			mainApp.loadSchemiDataBaseFromFile(new File(mainApp.getCurrentSchemiOracleFileName()), reload);
+			if (mainApp.getListSchemi() != null && mainApp.getListSchemi().size() > 0) {
+				Alert alertInfo = new Alert(AlertType.INFORMATION);
+				alertInfo.setTitle("Information");
+				alertInfo.setHeaderText("File Corrente Schemi Oracle ricaricato");
+				alertInfo.setContentText(
+						"Ricaricato File Corrente degli Schemi Oracle\n" + mainApp.getCurrentSchemiOracleFileName());
+				alertInfo.showAndWait();
+			}
+		}
+    	
+    }
+    
+    @FXML
     private void handlePathFileForSaveResultsFile() {
     	
         FileChooser fileChooser = new FileChooser();
@@ -165,13 +185,13 @@ public class RootLayoutController {
         	mainApp.setPathResultsFile(fileResults.getAbsolutePath());
         	mainApp.setFilePathRisultati(fileResults);
         	Alert alert = new Alert(AlertType.WARNING);
-        	alert.setTitle("Global Query");
+        	alert.setTitle("Global Query" + mainApp.getVersione());
         	alert.setHeaderText("Attenzione");
         	alert.setContentText("l'esecuzione delle query determina la sovrascrittura del file " + fileResults.getAbsolutePath() + " nel quale vengono salvati i dati estratti");
         	alert.showAndWait();
         } else {
         	Alert alert = new Alert(AlertType.ERROR);
-        	alert.setTitle("Global Query");
+        	alert.setTitle("Global Query" + mainApp.getVersione());
         	alert.setHeaderText("Errore - nome file non corretto");
         	alert.setContentText("Prima di procedere con l'esecuzione delle query è necessario indicare il file di destinazione dei risultati estratti ");
         	alert.showAndWait();
@@ -189,7 +209,7 @@ public class RootLayoutController {
     @FXML
     private void handleAbout() {
     	Alert alert = new Alert(AlertType.INFORMATION);
-    	alert.setTitle("Global Query");
+    	alert.setTitle("Global Query" + mainApp.getVersione());
     	alert.setHeaderText("info");
     	alert.setContentText("Permette la gestione (inserimento/modifica/cancellazione/elenco/salvataggio su file xml) delle query sql da eseguire su data base oracle; l'esecuzione viene ripetuta enne volte in funzione degli schemi oracle indicati nell'apposito file di input in formato xls. Il risultato dell'esecuzione viene automaticamente salvato su un file di tipo xls.");
 

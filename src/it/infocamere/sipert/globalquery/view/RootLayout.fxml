@@ -23,6 +23,7 @@
                   </MenuItem>
                   <MenuItem mnemonicParsing="false" onAction="#handleSaveAs" text="Save Query As..." />
                   <MenuItem mnemonicParsing="false" onAction="#handleSeeCurrentSchemi" text="Current File Schemi Data Base" />
+                  <MenuItem mnemonicParsing="false" onAction="#handleReloadCurrentSchemi" text="Reload Current File Schemi Data Base" />
                   <MenuItem mnemonicParsing="false" onAction="#handleOpenSchemi" text="New File Schemi Data Base">
                      <accelerator>
                         <KeyCodeCombination alt="UP" code="B" control="DOWN" meta="UP" shift="UP" shortcut="UP" />

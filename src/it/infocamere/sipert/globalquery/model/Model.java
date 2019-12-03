@@ -15,9 +15,9 @@ public class Model {
 
 	private List<SchemaDTO> schemi;
 	
-	public List<SchemaDTO> getSchemi(File fileSchemiXLS) throws ErroreFileSchemiNonTrovato, ErroreColonneFileXlsSchemiKo {
+	public List<SchemaDTO> getSchemi(File fileSchemiXLS, boolean reload) throws ErroreFileSchemiNonTrovato, ErroreColonneFileXlsSchemiKo {
 		
-		if (this.schemi == null) {
+		if (this.schemi == null || reload) {
 			SchemiManager schemiManager = new SchemiManager();
 			this.schemi = schemiManager.getListSchemi(fileSchemiXLS) ;
 
