@@ -149,6 +149,7 @@ public class QueryEditDialogController {
 
 	private void estrazioneDatiDB(QueryDB queryDB) {
 		
+		qtaRigheEstratte = 0;
 		estrazioneDatiTerminataCorrettamente = false;
 		erroreSuScritturaFileRisultati = false;
 		nessunDatoEstratto = false;

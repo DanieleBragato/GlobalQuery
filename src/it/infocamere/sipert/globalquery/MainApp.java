@@ -56,7 +56,7 @@ public class MainApp extends Application {
     
     private String pathResultsFile = "";
     
-    private String versione = " 1.2";
+    private String versione = " 1.3";
 
 	public List<SchemaDTO> getListSchemi() {
 		return listSchemi;
