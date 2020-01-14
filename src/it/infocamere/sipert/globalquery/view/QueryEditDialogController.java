@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.commons.io.FilenameUtils;
+
 import it.infocamere.sipert.globalquery.MainApp;
 import it.infocamere.sipert.globalquery.db.QueryDB;
 import it.infocamere.sipert.globalquery.db.dto.GenericResultsDTO;
@@ -13,7 +15,7 @@ import it.infocamere.sipert.globalquery.db.dto.SchemaDTO;
 import it.infocamere.sipert.globalquery.model.Model;
 import it.infocamere.sipert.globalquery.model.QueryModel;
 import it.infocamere.sipert.globalquery.util.Constants;
-import it.infocamere.sipert.globalquery.util.FileExcelCreator;
+import it.infocamere.sipert.globalquery.util.FileExcelCreatorPOI;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.concurrent.Task;
@@ -235,7 +237,7 @@ public class QueryEditDialogController {
 					updateProgress(i, listSchemi.size());
 				}
 				if (listResults.size() > 0) {
-					if (FileExcelCreator.writeFileExcelOfResults(pathFileResults, listResults, queryDB)) {
+					if (FileExcelCreatorPOI.writeFileExcelOfResults(pathFileResults, listResults, queryDB)) {
 						//System.out.println("sono dentro il metodo call del Task - estrazione Dati Terminata Correttamente");
 						estrazioneDatiTerminataCorrettamente = true;
 					} else {
@@ -319,16 +321,29 @@ public class QueryEditDialogController {
     private void doChangeFileRisultati(ActionEvent event) {
     	
 		FileChooser fileChooser = new FileChooser();
+		
+        FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
+                "XLSX files (*.xlsx)", "*.xlsx");
+        fileChooser.getExtensionFilters().add(extFilter);		
+		
 		fileChooser.setTitle("File Risultati");
 		pathFileResults = mainApp.getPathResultsFile();
 		fileChooser.setInitialFileName(pathFileResults);
 		File fileResults = fileChooser.showSaveDialog(mainApp.getStagePrincipale());
+		
+        String fileExtension = FilenameUtils.getExtension(fileResults.getAbsolutePath());
 
 		if (fileResults != null) {
-	        mainApp.setFilePathRisultati(fileResults);
-	        mainApp.setPathResultsFile(fileResults.getAbsolutePath());
-	        pathFileResults = fileResults.getAbsolutePath();
-	        labelFileRisultati.setText(pathFileResults);
+        	if (!(fileExtension != null && "xlsx".equals(fileExtension.toLowerCase()))) {
+    			showAlert(AlertType.ERROR, "Global Query" + mainApp.getVersione(), "Cambio file risultati non effettuato - tipo file non corretto",
+    					"Prima di procedere con l'esecuzione delle query è necessario indicare il file - tipo xlsx - di destinazione dei risultati estratti.",
+    					null);
+        	} else {
+    	        mainApp.setFilePathRisultati(fileResults);
+    	        mainApp.setPathResultsFile(fileResults.getAbsolutePath());
+    	        pathFileResults = fileResults.getAbsolutePath();
+    	        labelFileRisultati.setText(pathFileResults);
+        	}
 		} else {
 			showAlert(AlertType.ERROR, "Global Query" + mainApp.getVersione(), "Errore - nome file non corretto",
 					"Prima di procedere con l'esecuzione delle query è necessario indicare il file di destinazione dei risultati estratti ",
@@ -379,8 +394,8 @@ public class QueryEditDialogController {
     	
     	if (pathFileResults == null || "".equalsIgnoreCase(pathFileResults)) {
     		Alert alert = new Alert(AlertType.CONFIRMATION);
-    		alert.setTitle("Indicare il File xls dei risultati");
-    		alert.setHeaderText("Indicare il File xls sul quale salvare i risultati della query");
+    		alert.setTitle("Indicare il File xlsx dei risultati");
+    		alert.setHeaderText("Indicare il File xlsx sul quale salvare i risultati della query");
     		alert.setContentText("Scegli la tua opzione");
 
     		ButtonType buttonSelectFile = new ButtonType("Select File Risultati..");
@@ -397,6 +412,13 @@ public class QueryEditDialogController {
     			} 
     		} 
     	} else {
+            String fileExtension = FilenameUtils.getExtension(pathFileResults);
+        	if (!(fileExtension != null && "xlsx".equals(fileExtension.toLowerCase()))) {
+    			showAlert(AlertType.ERROR, "Global Query" + mainApp.getVersione(), "Errore - file non corretto",
+    					"Prima di procedere con l'esecuzione delle query è necessario indicare il file - tipo xlsx - di destinazione dei risultati estratti ",
+    					null);
+            	return false;
+        	}            
     		fileIsOk = true;
     	}
     	
@@ -407,20 +429,32 @@ public class QueryEditDialogController {
     	
         FileChooser fileChooser = new FileChooser();
 
-        // impostazione del filtro dell'estensione
+        // impostazione del filtro dell'estensione xlsx
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                "XLS files (*.xls)", "*.xls");
+                "XLSX files (*.xlsx)", "*.xlsx");
         fileChooser.getExtensionFilters().add(extFilter);
 
         File fileResults = fileChooser.showOpenDialog(mainApp.getStagePrincipale());
+        
+        String fileExtension = FilenameUtils.getExtension(fileResults.getAbsolutePath());
 
         if (fileResults != null) {
+        	if (!(fileExtension != null && "xlsx".equals(fileExtension.toLowerCase()))) {
+    			showAlert(AlertType.ERROR, "Global Query" + mainApp.getVersione(), "Errore - file non corretto",
+    					"Prima di procedere con l'esecuzione delle query è necessario indicare il file - tipo xlsx - di destinazione dei risultati estratti ",
+    					null);
+            	return false;
+        	}
         	mainApp.setFilePathRisultati(fileResults);
         	mainApp.setPathResultsFile(fileResults.getAbsolutePath());
-        	showAlert(AlertType.WARNING, "Global Query" + mainApp.getVersione(), "Attenzione", "l'esecuzione delle query determina la sovrascrittura del file \" + fileResults.getAbsolutePath() + \"\\nnel quale vengono salvati i dati estratti", null);
+			showAlert(AlertType.WARNING, "Global Query" + mainApp.getVersione(), "Attenzione",
+					"l'esecuzione delle query determina la sovrascrittura del file \" + fileResults.getAbsolutePath() + \"\\nnel quale verranno salvati i dati estratti",
+					null);
         	return true;
         } else {
-        	showAlert(AlertType.ERROR, "Global Query" + mainApp.getVersione(), "Errore - nome file non corretto", "Prima di procedere con l'esecuzione delle query è necessario indicare il file di destinazione dei risultati estratti ", null);
+			showAlert(AlertType.ERROR, "Global Query" + mainApp.getVersione(), "Errore - nome file non corretto",
+					"Prima di procedere con l'esecuzione delle query è necessario indicare il file - tipo xlsx - di destinazione dei risultati estratti ",
+					null);
         	return false;
         }
     }

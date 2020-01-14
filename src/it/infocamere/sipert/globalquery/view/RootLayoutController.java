@@ -3,6 +3,8 @@ package it.infocamere.sipert.globalquery.view;
 import java.io.File;
 import java.util.Optional;
 
+import org.apache.commons.io.FilenameUtils;
+
 import it.infocamere.sipert.globalquery.MainApp;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
@@ -176,19 +178,29 @@ public class RootLayoutController {
 
         // impostazione del filtro dell'estensione
         FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter(
-                "XLS files (*.xls)", "*.xls");
+        		"XLSX files (*.xlsx)", "*.xlsx");
         fileChooser.getExtensionFilters().add(extFilter);
 
         File fileResults = fileChooser.showOpenDialog(mainApp.getStagePrincipale());
+        
+        String fileExtension = FilenameUtils.getExtension(fileResults.getAbsolutePath());
 
         if (fileResults != null) {
-        	mainApp.setPathResultsFile(fileResults.getAbsolutePath());
-        	mainApp.setFilePathRisultati(fileResults);
-        	Alert alert = new Alert(AlertType.WARNING);
-        	alert.setTitle("Global Query" + mainApp.getVersione());
-        	alert.setHeaderText("Attenzione");
-        	alert.setContentText("l'esecuzione delle query determina la sovrascrittura del file " + fileResults.getAbsolutePath() + " nel quale vengono salvati i dati estratti");
-        	alert.showAndWait();
+        	if (!(fileExtension != null && "xlsx".equals(fileExtension.toLowerCase()))) {
+        		Alert alert = new Alert(AlertType.ERROR);
+        		alert.setTitle("Global Query" + mainApp.getVersione());
+        		alert.setHeaderText("Errore - nome file non corretto");
+            	alert.setContentText("Prima di procedere con l'esecuzione delle query è necessario indicare il file - tipo xlsx - di destinazione dei risultati estratti ");
+            	alert.showAndWait();        		
+        	} else {
+            	mainApp.setPathResultsFile(fileResults.getAbsolutePath());
+            	mainApp.setFilePathRisultati(fileResults);
+            	Alert alert = new Alert(AlertType.WARNING);
+            	alert.setTitle("Global Query" + mainApp.getVersione());
+            	alert.setHeaderText("Attenzione");
+            	alert.setContentText("l'esecuzione delle query determina la sovrascrittura del file " + fileResults.getAbsolutePath() + " nel quale verranno salvati i dati estratti");
+            	alert.showAndWait();        		
+        	}
         } else {
         	Alert alert = new Alert(AlertType.ERROR);
         	alert.setTitle("Global Query" + mainApp.getVersione());
@@ -211,7 +223,7 @@ public class RootLayoutController {
     	Alert alert = new Alert(AlertType.INFORMATION);
     	alert.setTitle("Global Query" + mainApp.getVersione());
     	alert.setHeaderText("info");
-    	alert.setContentText("Permette la gestione (inserimento/modifica/cancellazione/elenco/salvataggio su file xml) delle query sql da eseguire su data base oracle; l'esecuzione viene ripetuta enne volte in funzione degli schemi oracle indicati nell'apposito file di input in formato xls. Il risultato dell'esecuzione viene automaticamente salvato su un file di tipo xls.");
+    	alert.setContentText("Permette la gestione (inserimento/modifica/cancellazione/elenco/salvataggio su file xml) delle query sql da eseguire su data base oracle; l'esecuzione viene ripetuta enne volte in funzione degli schemi oracle indicati nell'apposito file di input in formato xls. Il risultato dell'esecuzione viene automaticamente salvato su un file di tipo xlsx.");
 
     	alert.showAndWait();
     }

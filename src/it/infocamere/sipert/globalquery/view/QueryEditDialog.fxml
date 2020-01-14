@@ -97,11 +97,11 @@
                         <Insets left="5.0" top="5.0" />
                      </HBox.margin>
                   </Button>
-                  <Label text="File risultati ">
+                  <Label prefWidth="110.0" text="File xlsx risultati ">
                      <HBox.margin>
                         <Insets left="5.0" top="10.0" />
                      </HBox.margin></Label>
-                  <Label fx:id="labelFileRisultati" prefHeight="21.0" prefWidth="651.0" styleClass="label-bright">
+                  <Label fx:id="labelFileRisultati" prefHeight="21.0" prefWidth="600.0" styleClass="label-bright">
                      <HBox.margin>
                         <Insets left="5.0" top="10.0" />
                      </HBox.margin></Label>
