@@ -1,7 +1,5 @@
 package it.infocamere.sipert.globalquery.util;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -12,35 +10,33 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CreationHelper;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRichTextString;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import it.infocamere.sipert.globalquery.db.QueryDB;
 import it.infocamere.sipert.globalquery.db.dto.GenericResultsDTO;
-import jxl.Workbook;
 import jxl.write.Label;
 import jxl.write.Number;
 import jxl.write.WritableSheet;
-import jxl.write.WritableWorkbook;
 import jxl.write.WriteException;
 import jxl.write.biff.RowsExceededException;
 
 public class FileExcelCreatorPOI {
 	
-	private static Logger LOGGER = Logger.getLogger(FileExcelCreator.class.getName());
+//	private static Logger LOGGER = Logger.getLogger(FileExcelCreator.class.getName());
 	
 	private static CellStyle dateCellStyle;
 	
-	public static boolean writeFileExcelOfResults(String fileName, List<GenericResultsDTO> results, QueryDB queryDB) {
+	public static boolean writeFileExcelOfResultsWithXSSFWorkbook(String fileName, List<GenericResultsDTO> results, QueryDB queryDB) {
 		
-		LOGGER.debug("writeFileExcelOfResults");
+//		LOGGER.debug("writeFileExcelOfResults");
         
 		//Blank workbook
         XSSFWorkbook xssfworkbook = new XSSFWorkbook();
@@ -110,13 +106,13 @@ public class FileExcelCreatorPOI {
             	}
             }
             
-            
+            System.out.println("PRIMA di xssfworkbook.write(fileOutStream) " + (new Date()).toString());
             xssfworkbook.write(fileOutStream);
 
         } catch (IOException e1) {
             throw new RuntimeException(e1.toString(), e1);
         } finally {
-
+        	System.out.println("DENTRO IL BLOCCO finally di xssfworkbook.write(fileOutStream) " + (new Date()).toString());
         	if (xssfworkbook != null) {
                 	try {
 						xssfworkbook.close();
@@ -134,6 +130,105 @@ public class FileExcelCreatorPOI {
 		return false;
 	}
 
+	@SuppressWarnings({ "finally", "resource" })
+	public static boolean writeFileExcelOfResultsWithSXSSFWorkbook(String fileName, List<GenericResultsDTO> results, QueryDB queryDB) {
+		
+//		LOGGER.debug("writeFileExcelOfResults");
+        
+		//Blank workbook
+		// keep 100 rows in memory, exceeding rows will be flushed to disk
+		SXSSFWorkbook sxssfworkbook = new SXSSFWorkbook(SXSSFWorkbook.DEFAULT_WINDOW_SIZE/* 100 */);
+        FileOutputStream fileOutStream = null;
+        
+        dateCellStyle = sxssfworkbook.createCellStyle();
+    	CreationHelper dateStyleHelper = sxssfworkbook.getCreationHelper();
+    	dateCellStyle.setDataFormat(dateStyleHelper.createDataFormat().getFormat("m/d/yy"));        
+        
+        try {
+            // CREO I 2 FOGLI: Dati Estratti e Query
+        	Sheet sxssfsheetDatiEstratti = sxssfworkbook.createSheet("Dati Estratti");        				
+        	Sheet sxssfsheetQuery = sxssfworkbook.createSheet("Query");
+        	// CREO LA PRIMA RIGA DEL FOGLIO DELLA QUERY: servirà per valorizzare la query usata in fase di estrazione dati da data-base
+        	Row sxssfQueryRowTitoli = sxssfsheetQuery.createRow(Constants.RIGA_ZERO);
+        	// CREO UNA CELLA CHE VALORIZZO CON LA QUERY USATA 
+        	Cell sxssfCellQuery = sxssfQueryRowTitoli.createCell(Constants.COLONNA_ZERO);
+        	sxssfCellQuery.setCellValue(queryDB.getQuery());
+        	// CREO LA RIGA DEI TITOLI DEI DATI ESTRATTI
+        	Row sxssfDatiEstrattiRowTitoli = sxssfsheetDatiEstratti.createRow(Constants.RIGA_ZERO);
+            
+            int iRiga = 1;	
+            for (GenericResultsDTO resultsDTO : results) {
+            	// risultati di un singolo schema dentro resultsDTO 
+            	//System.out.println("Schema = " + resultsDTO.getSchema());
+            	
+            	for (LinkedHashMap<String, Object> map : resultsDTO.getListLinkedHashMap()) {
+            		
+                	// CREO RIGA RISULTATI
+            		Row xssfDatiEstrattiRow = sxssfsheetDatiEstratti.createRow(iRiga);
+            		
+            		Set entrySet = map.entrySet();
+            		Iterator it = entrySet.iterator();
+        			//System.out.println("riga = " + iRiga);
+            		if (iRiga == 1) {
+        				//  inserimento del nome della prima colonna (Schema)    
+            			addCellValueXssf(sxssfDatiEstrattiRowTitoli, Constants.COLONNA_ZERO, Constants.SCHEMA);
+            			addCellValueXssf(xssfDatiEstrattiRow, Constants.COLONNA_ZERO, resultsDTO.getSchema());
+            		} else {
+        				//  inserimento del valore della colonna (Schema)
+            			addCellValueXssf(xssfDatiEstrattiRow, Constants.COLONNA_ZERO, resultsDTO.getSchema());
+            		}
+        			int iColonna = 1;
+            		while(it.hasNext()){
+            			//System.out.println("colonna = " + iColonna);
+            			Map.Entry me = (Map.Entry)it.next();
+            			//System.out.println("me.getKey() = " + me.getKey());
+            			//System.out.println("me.getValue() = " + me.getValue());
+            			if (iRiga == 1) {
+            				//  inserimento dei nomi delle colonne
+            				if (me.getKey() instanceof String) {
+            		            addCellValueXssf(sxssfDatiEstrattiRowTitoli, iColonna, me.getKey());
+                				addCellValueXssf(xssfDatiEstrattiRow, iColonna, me.getValue());
+            				} else {
+            					// TODO  gestire l'eventuale assenza del tipo nome colonna diverso da String 
+            				}
+            			} else {
+            				//  inserimento dei valori delle colonne
+            				addCellValueXssf(xssfDatiEstrattiRow, iColonna, me.getValue());
+            			}
+            			iColonna++;
+            		}
+            		iRiga++;
+            	}
+            }
+
+            System.out.println("PRIMA di new FileOutputStream(fileName) " + (new Date()).toString());            
+        	fileOutStream = new FileOutputStream(fileName);
+            System.out.println("PRIMA di xssfworkbook.write(fileOutStream) " + (new Date()).toString());
+            sxssfworkbook.write(fileOutStream);
+
+        } catch (IOException e1) {
+            throw new RuntimeException(e1.toString(), e1);
+        } finally {
+        	System.out.println("DENTRO IL BLOCCO finally di xssfworkbook.write(fileOutStream) " + (new Date()).toString());
+			try {
+				if (fileOutStream != null) {
+					fileOutStream.close();
+				}
+			} catch (IOException e2) {
+				throw new RuntimeException(e2.toString(), e2);
+			}
+        	try {
+				if (sxssfworkbook != null) {
+					sxssfworkbook.close();
+				}
+				return true;
+			} catch (IOException e3) {
+				throw new RuntimeException(e3.toString(), e3);
+			}
+        }
+		
+	}
+	
 	private static void addCellValue(WritableSheet excelSheet, int colonna, int riga, Object obj) {
 		
 		try {
@@ -159,11 +254,11 @@ public class FileExcelCreatorPOI {
 				excelSheet.addCell(number);
 			}
 		} catch (RowsExceededException e) {
-			LOGGER.debug("addCellValue RowsExceededException");
+//			LOGGER.debug("addCellValue RowsExceededException");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (WriteException e) {
-			LOGGER.debug("addCellValue WriteException");
+//			LOGGER.debug("addCellValue WriteException");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

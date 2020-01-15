@@ -188,7 +188,7 @@ public class QueryEditDialogController {
                 copyWorker.cancel(true);
                 bar.progressProperty().unbind();
                 labelInfoEsecuzione.textProperty().unbind();
-                labelInfoEsecuzione.setText("Elaborazione fallita!");
+                labelInfoEsecuzione.setText("Elaborazione fallita!");    
                 bar.setProgress(0);
             	btnRunQuery.setDisable(false);
                 bntStop.setDisable(true);
@@ -231,14 +231,16 @@ public class QueryEditDialogController {
 					risultatiDTO = model.runQuery (listSchemi.get(i), queryDB); 
 					//System.out.println("Schema nr. " + (i+1) + " " + listSchemi.get(i).getSchemaUserName() + " - qta righe = " + risultatiDTO.getListLinkedHashMap().size());
 					
-					updateMessage("Schema nr. " + (i+1) + " di " + listSchemi.size() + " - " + listSchemi.get(i).getSchemaUserName() + " - qta righe estratte = " + risultatiDTO.getListLinkedHashMap().size());
-					
 					qtaRigheEstratte = qtaRigheEstratte + risultatiDTO.getListLinkedHashMap().size();
+					
+					updateMessage("Totale righe estratte = " + qtaRigheEstratte + " - Schema nr. " + (i+1) + " di " + listSchemi.size() + " - " + listSchemi.get(i).getSchemaUserName() + " - qta righe estratte = " + risultatiDTO.getListLinkedHashMap().size());
+					
 					listResults.add(risultatiDTO);
 					updateProgress(i, listSchemi.size());
 				}
 				if (listResults.size() > 0) {
-					if (FileExcelCreatorPOI.writeFileExcelOfResults(pathFileResults, listResults, queryDB)) {
+					updateMessage("Totale righe estratte = " + qtaRigheEstratte + " - Scrittura File Risultati in corso... attendere");
+					if (FileExcelCreatorPOI.writeFileExcelOfResultsWithSXSSFWorkbook(pathFileResults, listResults, queryDB)) {
 						//System.out.println("sono dentro il metodo call del Task - estrazione Dati Terminata Correttamente");
 						estrazioneDatiTerminataCorrettamente = true;
 					} else {
@@ -260,6 +262,7 @@ public class QueryEditDialogController {
                 bar.progressProperty().unbind();
                 labelInfoEsecuzione.textProperty().unbind();
                 labelInfoEsecuzione.setText("Elaborazione terminata correttamente");
+                labelInfoEsecuzione.textProperty().unbind();                
                 bar.setProgress(0);
             	btnRunQuery.setDisable(false);
                 bntStop.setDisable(true);
