@@ -229,6 +229,89 @@ public class FileExcelCreatorPOI {
 		
 	}
 	
+	@SuppressWarnings({ "finally", "resource" })
+	public static boolean writeFileExcelOfResultsWithSXSSFWorkbookAndAppend(String fileName, GenericResultsDTO resultsDTO, QueryDB queryDB, SXSSFWorkbook sxssfworkbook, Sheet sxssfsheetDatiEstratti, int iRiga) {
+		
+//		LOGGER.debug("writeFileExcelOfResults");
+        
+        FileOutputStream fileOutStream = null;
+        
+        dateCellStyle = sxssfworkbook.createCellStyle();
+    	CreationHelper dateStyleHelper = sxssfworkbook.getCreationHelper();
+    	dateCellStyle.setDataFormat(dateStyleHelper.createDataFormat().getFormat("m/d/yy"));        
+        
+        try {
+        				
+        	// CREO LA RIGA DEI TITOLI DEI DATI ESTRATTI
+            //int iRiga = 1;
+        	
+            //int iRiga = sxssfsheetDatiEstratti.getPhysicalNumberOfRows();
+            
+//        	Row sxssfDatiEstrattiRowTitoli = sxssfsheetDatiEstratti.createRow(Constants.RIGA_ZERO);
+            	
+            //System.out.println("Schema = " + resultsDTO.getSchema());
+            	
+        	for (LinkedHashMap<String, Object> map : resultsDTO.getListLinkedHashMap()) {
+        		
+            	// CREO RIGA RISULTATI
+        		Row xssfDatiEstrattiRow = sxssfsheetDatiEstratti.createRow(iRiga);
+        		System.out.println("FATTA CREATEROW CON NUMERO = " + iRiga);
+        		
+        		Set entrySet = map.entrySet();
+        		Iterator it = entrySet.iterator();
+    			//System.out.println("riga = " + iRiga);
+//        		if (iRiga == 1) {
+    				//  inserimento del nome della prima colonna (Schema)    
+//        			addCellValueXssf(sxssfDatiEstrattiRowTitoli, Constants.COLONNA_ZERO, Constants.SCHEMA);
+//        			addCellValueXssf(xssfDatiEstrattiRow, Constants.COLONNA_ZERO, resultsDTO.getSchema());
+//        		} else {
+    				//  inserimento del valore della colonna (Schema)
+        			addCellValueXssf(xssfDatiEstrattiRow, Constants.COLONNA_ZERO, resultsDTO.getSchema());
+//        		}
+    			int iColonna = 1;
+        		while(it.hasNext()){
+        			//System.out.println("colonna = " + iColonna);
+        			Map.Entry me = (Map.Entry)it.next();
+        			//System.out.println("me.getKey() = " + me.getKey());
+        			//System.out.println("me.getValue() = " + me.getValue());
+//        			if (iRiga == 1) {
+        				//  inserimento dei nomi delle colonne
+//        				if (me.getKey() instanceof String) {
+//        		            addCellValueXssf(sxssfDatiEstrattiRowTitoli, iColonna, me.getKey());
+//            				addCellValueXssf(xssfDatiEstrattiRow, iColonna, me.getValue());
+//        				} else {
+        					// TODO  gestire l'eventuale assenza del tipo nome colonna diverso da String 
+//        				}
+//        			} else {
+        				//  inserimento dei valori delle colonne
+        				addCellValueXssf(xssfDatiEstrattiRow, iColonna, me.getValue());
+//        			}
+        			iColonna++;
+        		}
+        		iRiga++;
+        	}
+
+            System.out.println("PRIMA di new FileOutputStream(fileName) " + (new Date()).toString());            
+        	fileOutStream = new FileOutputStream(fileName, true);
+            System.out.println("PRIMA di xssfworkbook.write(fileOutStream) " + (new Date()).toString());
+            sxssfworkbook.write(fileOutStream);
+
+        } catch (IOException e1) {
+            throw new RuntimeException(e1.toString(), e1);
+        } finally {
+        	System.out.println("DENTRO IL BLOCCO finally di xssfworkbook.write(fileOutStream) " + (new Date()).toString());
+			try {
+				if (fileOutStream != null) {
+					fileOutStream.close();
+				}
+				return true;
+			} catch (IOException e2) {
+				throw new RuntimeException(e2.toString(), e2);
+			}
+        }
+		
+	}	
+	
 	private static void addCellValue(WritableSheet excelSheet, int colonna, int riga, Object obj) {
 		
 		try {
@@ -265,7 +348,7 @@ public class FileExcelCreatorPOI {
 
 	}
 	
-	private static void addCellValueXssf(Row row, int colonna, Object o) {
+	public static void addCellValueXssf(Row row, int colonna, Object o) {
 		
 		Cell cell = row.createCell(colonna);
 		

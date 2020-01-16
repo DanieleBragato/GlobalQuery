@@ -1,12 +1,24 @@
 package it.infocamere.sipert.globalquery.view;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.CreationHelper;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 
 import it.infocamere.sipert.globalquery.MainApp;
 import it.infocamere.sipert.globalquery.db.QueryDB;
@@ -77,6 +89,8 @@ public class QueryEditDialogController {
     private int qtaRigheEstratte = 0;
     
     private Task copyWorker;
+    
+    private static CellStyle dateCellStyle;
     
     private MainApp mainApp;
 	
@@ -221,35 +235,104 @@ public class QueryEditDialogController {
 
 				//System.out.println("sono dentro il metodo call del Task");
 				GenericResultsDTO risultatiDTO;
-				//System.out.println(listSchemi.size() + " Schemi da trattare");
-				for (int i = 0; i < listSchemi.size(); i++) {
-					//System.out.println("Inizio trattamento dello Schema " + listSchemi.get(i).getSchemaUserName());
-					if (this.isCancelled()) {
-						//System.out.println("Canceling...");
-						break;
-					} 
-					risultatiDTO = model.runQuery (listSchemi.get(i), queryDB); 
-					//System.out.println("Schema nr. " + (i+1) + " " + listSchemi.get(i).getSchemaUserName() + " - qta righe = " + risultatiDTO.getListLinkedHashMap().size());
-					
-					qtaRigheEstratte = qtaRigheEstratte + risultatiDTO.getListLinkedHashMap().size();
-					
-					updateMessage("Totale righe estratte = " + qtaRigheEstratte + " - Schema nr. " + (i+1) + " di " + listSchemi.size() + " - " + listSchemi.get(i).getSchemaUserName() + " - qta righe estratte = " + risultatiDTO.getListLinkedHashMap().size());
-					
-					listResults.add(risultatiDTO);
-					updateProgress(i, listSchemi.size());
-				}
-				if (listResults.size() > 0) {
-					updateMessage("Totale righe estratte = " + qtaRigheEstratte + " - Scrittura File Risultati in corso... attendere");
-					if (FileExcelCreatorPOI.writeFileExcelOfResultsWithSXSSFWorkbook(pathFileResults, listResults, queryDB)) {
-						//System.out.println("sono dentro il metodo call del Task - estrazione Dati Terminata Correttamente");
+				
+		        FileOutputStream fileOutStream = null;
+				
+				//Blank workbook
+				// keep 100 rows in memory, exceeding rows will be flushed to disk
+				SXSSFWorkbook sxssfworkbook = new SXSSFWorkbook(SXSSFWorkbook.DEFAULT_WINDOW_SIZE/* 100 */);
+		        dateCellStyle = sxssfworkbook.createCellStyle();
+		    	CreationHelper dateStyleHelper = sxssfworkbook.getCreationHelper();
+		    	dateCellStyle.setDataFormat(dateStyleHelper.createDataFormat().getFormat("m/d/yy"));
+	            // CREO I 2 FOGLI: Dati Estratti e Query
+	        	Sheet sxssfsheetDatiEstratti = sxssfworkbook.createSheet("Dati Estratti");
+	        	Sheet sxssfsheetQuery = sxssfworkbook.createSheet("Query");
+//	        	// CREO LA PRIMA RIGA DEL FOGLIO DELLA QUERY: servirà per valorizzare la query usata in fase di estrazione dati da data-base
+	        	Row sxssfQueryRowTitoli = sxssfsheetQuery.createRow(Constants.RIGA_ZERO);
+//	        	// CREO UNA CELLA CHE VALORIZZO CON LA QUERY USATA 
+	        	Cell sxssfCellQuery = sxssfQueryRowTitoli.createCell(Constants.COLONNA_ZERO);
+	        	sxssfCellQuery.setCellValue(queryDB.getQuery());		
+	        	// CREO LA RIGA DEI TITOLI DEI DATI ESTRATTI
+	        	Row sxssfDatiEstrattiRowTitoli = sxssfsheetDatiEstratti.createRow(Constants.RIGA_ZERO);	        	
+				
+	        	int iRiga = 1;
+				try {
+					//System.out.println(listSchemi.size() + " Schemi da trattare");
+					for (int i = 0; i < listSchemi.size(); i++) {
+						//System.out.println("Inizio trattamento dello Schema " + listSchemi.get(i).getSchemaUserName());
+						if (this.isCancelled()) {
+							//System.out.println("Canceling...");
+							break;
+						} 
+						risultatiDTO = model.runQuery (listSchemi.get(i), queryDB); 
+						//System.out.println("Schema nr. " + (i+1) + " " + listSchemi.get(i).getSchemaUserName() + " - qta righe = " + risultatiDTO.getListLinkedHashMap().size());
+						
+						qtaRigheEstratte = qtaRigheEstratte + risultatiDTO.getListLinkedHashMap().size();
+						updateMessage("Totale righe estratte = " + qtaRigheEstratte + " - Schema nr. " + (i+1) + " di " + listSchemi.size() + " - " + listSchemi.get(i).getSchemaUserName() + " - qta righe estratte = " + risultatiDTO.getListLinkedHashMap().size());
+						
+						for (LinkedHashMap<String, Object> map : risultatiDTO.getListLinkedHashMap()) {
+					    	// CREO RIGA RISULTATI
+							Row xssfDatiEstrattiRow = sxssfsheetDatiEstratti.createRow(iRiga);
+							
+							Set entrySet = map.entrySet();
+							Iterator it = entrySet.iterator();
+		            		if (iRiga == 1) {
+		        				//  inserimento del nome della prima colonna (Schema)    
+		            			FileExcelCreatorPOI.addCellValueXssf(sxssfDatiEstrattiRowTitoli, Constants.COLONNA_ZERO, Constants.SCHEMA);
+		            			FileExcelCreatorPOI.addCellValueXssf(xssfDatiEstrattiRow, Constants.COLONNA_ZERO, risultatiDTO.getSchema());
+		            		} else {
+		        				//  inserimento del valore della colonna (Schema)
+								FileExcelCreatorPOI.addCellValueXssf(xssfDatiEstrattiRow, Constants.COLONNA_ZERO, risultatiDTO.getSchema());		            			
+		            		}
+							
+							int iColonna = 1;
+							while(it.hasNext()){
+								//System.out.println("colonna = " + iColonna);
+								Map.Entry me = (Map.Entry)it.next();
+		            			if (iRiga == 1) {
+		            				//  inserimento dei nomi delle colonne
+		            				if (me.getKey() instanceof String) {
+		            					FileExcelCreatorPOI.addCellValueXssf(sxssfDatiEstrattiRowTitoli, iColonna, me.getKey());
+		            					FileExcelCreatorPOI.addCellValueXssf(xssfDatiEstrattiRow, iColonna, me.getValue());
+		            				} else {
+		            					// TODO  gestire l'eventuale assenza del tipo nome colonna diverso da String 
+		            				}
+		            			} else {
+									FileExcelCreatorPOI.addCellValueXssf(xssfDatiEstrattiRow, iColonna, me.getValue());		            				
+		            			}
+								iColonna++;
+							}
+							iRiga++;
+						}
+						
+						updateProgress(i, listSchemi.size());
+					}
+					if (qtaRigheEstratte > 0) {
+						updateMessage("Totale righe estratte = " + qtaRigheEstratte + " - Scrittura File Risultati in corso... attendere");
+						fileOutStream = new FileOutputStream(pathFileResults);
+						sxssfworkbook.write(fileOutStream);
 						estrazioneDatiTerminataCorrettamente = true;
 					} else {
-						//System.out.println("sono dentro il metodo call del Task - errore Su Scrittura File Risultati");
-						erroreSuScritturaFileRisultati = true;
+						//System.out.println("sono dentro il metodo call del Task - nessun Dato Estratto");
+						nessunDatoEstratto = true;
 					}
-				} else {
-					//System.out.println("sono dentro il metodo call del Task - nessun Dato Estratto");
-					nessunDatoEstratto = true;
+				} catch (Exception e) {
+					throw new RuntimeException(e.toString(), e);
+				} finally {
+					try {
+						if (fileOutStream != null) {
+							fileOutStream.close();
+						}
+					} catch (IOException e2) {
+						throw new RuntimeException(e2.toString(), e2);
+					}
+		        	try {
+						if (sxssfworkbook != null) {
+							sxssfworkbook.close();
+						}
+					} catch (IOException e3) {
+						throw new RuntimeException(e3.toString(), e3);
+					}					
 				}
                 return true;
             }
