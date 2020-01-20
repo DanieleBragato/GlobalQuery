@@ -223,7 +223,7 @@ public class RootLayoutController {
     	Alert alert = new Alert(AlertType.INFORMATION);
     	alert.setTitle("Global Query" + mainApp.getVersione());
     	alert.setHeaderText("info");
-    	alert.setContentText("Permette la gestione (inserimento/modifica/cancellazione/elenco/salvataggio su file xml) delle query sql da eseguire su data base oracle; l'esecuzione viene ripetuta enne volte in funzione degli schemi oracle indicati nell'apposito file di input in formato xls. Il risultato dell'esecuzione viene automaticamente salvato su un file di tipo xlsx.");
+    	alert.setContentText("Permette la gestione (inserimento/modifica/cancellazione/elenco/salvataggio su file xml) delle query sql da eseguire su data base oracle; l'esecuzione viene ripetuta enne volte in funzione degli schemi oracle indicati nell'apposito file di input in formato xls. Il risultato dell'esecuzione viene automaticamente salvato su un file di tipo xlsx (al massimo 1048756 righe - limite di excel).");
 
     	alert.showAndWait();
     }
